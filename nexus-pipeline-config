@@ -1,0 +1,19 @@
+            stage ('Artifact Deploy to Nexus') {
+             steps {
+                   nexusArtifactUploader(
+                   nexusVersion: 'nexus3',
+                   protocol: 'http',
+                   nexusUrl: '18.224.25.230:8081',
+                   groupId: 'MY-POC',
+                   version: '1.0-SNAPSHOT',
+                   repository: 'maven-snapshots',
+                   credentialsId: 'nexus-credentials',
+                       artifacts: [
+                         [artifactId: 'POC-CI-CD',
+                         type: 'war',
+                         classifier: '',
+                         file: 'webapp/target/webapp.war']
+                       ]
+                   )
+               }
+          }
