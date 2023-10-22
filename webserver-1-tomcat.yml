@@ -1,0 +1,34 @@
+---
+- hosts: webserver-1
+  become: true
+  tasks:
+  - name: Install Java 
+    yum: name=java-11* state=present
+
+  - name: Make directory /opt/tomcat
+    command: mkdir -p /opt/tomcat
+    
+  - name: Download Tomcat
+    get_url: url=https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.109/bin/apache-tomcat-7.0.109.tar.gz dest=/opt/tomcat
+
+  - name: Extract the file downloaded tomcat file
+    command: tar xf /opt/tomcat/apache-tomcat-7.0.109.tar.gz -C /opt/tomcat/
+ 
+  - name: Move the Tomcat directory to a smaller one
+    command: cd /opt/tomcat && cp -r apache-tomcat-7.0.109/* . 
+    become: true
+    become_user: root
+ 
+  - name: Remove tar file and extract directory
+    command: rm -rf apache-tomcat*
+  
+  - name: Change Ownership and group of the Tomcat directory
+    file: path=/opt/tomcat owner=jenkins group=jenkins mode=775 state=directory recurse=yes
+ 
+  - name: Start Tomcat
+    command: nohup /opt/tomcat/bin/startup.sh # Execute command even after you have exited from the shell prompt
+    become: true
+    become_user: jenkins
+  
+  - name: Deploy the new WAR file to target servers
+    copy: src=webapp/target/webapp.war  dest=/opt/tomcat/webapps
