@@ -15,7 +15,7 @@
     command: tar xf /opt/tomcat/apache-tomcat-7.0.109.tar.gz -C /opt/tomcat/
  
   - name: Move the Tomcat directory to a smaller one
-    command: cp -r /opt/tomcat/apache-tomcat-7.0.109/* /opt/tomcat/
+    command: cd /opt/tomcat && cp -r apache-tomcat-7.0.109/* . 
     become: true
     become_user: root
  
