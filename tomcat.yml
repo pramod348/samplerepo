@@ -15,7 +15,10 @@
     command: tar xf /opt/tomcat/apache-tomcat-7.0.109.tar.gz -C /opt/tomcat/
  
   - name: Move the Tomcat directory to a smaller one
-    command: mv /opt/tomcat/apache-tomcat-7.0.109/* /opt/tomcat/
+    command: cp -r /opt/tomcat/apache-tomcat-7.0.109/* /opt/tomcat/
+
+  - name: Remove tar file and extract directory
+    command: rm -rf apache-tomcat*
   
   - name: Change Ownership and group of the Tomcat directory
     file: path=/opt/tomcat owner=jenkins group=jenkins mode=775 state=directory recurse=yes
