@@ -16,7 +16,9 @@
  
   - name: Move the Tomcat directory to a smaller one
     command: cp -r /opt/tomcat/apache-tomcat-7.0.109/* /opt/tomcat/
-
+    become: true
+    become_user: root
+ 
   - name: Remove tar file and extract directory
     command: rm -rf apache-tomcat*
   
