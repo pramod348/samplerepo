@@ -2,7 +2,7 @@
 - hosts: webservers
   become: true
   tasks:
-  - name: Deploy the new WAR file to target servers
+  - name: Install Java 
     yum: name=java-11* state=present
 
   - name: Make directory /opt/tomcat
@@ -12,10 +12,10 @@
     get_url: url=https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.109/bin/apache-tomcat-7.0.109.tar.gz dest=/opt/tomcat
 
   - name: Extract the file downloaded tomcat file
-    command: tar xvf /opt/tomcat/apache-tomcat-7.0.109.tar.gz -C /opt/tomcat/
+    command: tar xf /opt/tomcat/apache-tomcat-7.0.109.tar.gz -C /opt/tomcat/
  
   - name: Move the Tomcat directory to a smaller one
-    command: mv apache-tomcat-7.0.109/* /opt/tomcat
+    command: mv /opt/tomcat/apache-tomcat-7.0.109/* /opt/tomcat/
   
   - name: Change Ownership and group of the Tomcat directory
     file: path=/opt/tomcat owner=jenkins group=jenkins mode=775 state=directory recurse=yes
