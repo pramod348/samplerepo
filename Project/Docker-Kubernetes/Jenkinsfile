@@ -1,0 +1,107 @@
+pipeline{
+    agent {
+      node {
+        label 'slave_1'
+      }
+    }
+
+    tools {
+         maven 'MAVEN_HOME'
+         jdk 'JAVA_HOME'
+    }
+
+    stages{
+       stage('Git Checkout'){
+            steps{
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/GoudSagar/Hello-World-Code.git']]])
+            }
+        }
+        stage('build'){
+            steps{
+               sh '''
+                mvn package
+		cp -r webapp/target/webapp.war ${WORKSPACE}/Docker/
+                '''
+            }
+        }
+        stage ('Unit Test') {
+	        steps {
+                echo 'Running Unit Testing'
+                sh '''
+                mvn test
+                '''
+             }
+         }
+         stage('Docker') {
+           parallel {
+               stage('Docker Build') {
+                 steps{
+                    script {
+                      sh "docker build -t goudsagar/webapp-app-tomcat:latest -f Docker/Dockerfile ."
+                     }
+                    } 
+                }
+                stage('Docker Push') {
+                 steps{
+                   script {
+                        withDockerRegistry(credentialsId: 'docker-credentials') {
+                            sh "docker push goudsagar/webapp-app-tomcat:latest"
+                             }
+                         }
+                     }
+                } 
+              }
+          } 
+          stage('Kubernetes Deployment') {
+            parallel {
+              stage('Kubernetes Dev') {
+                 when {
+                   expression { "$Env_Name" == 'dev-ns' }
+                 }
+                  steps{
+                      echo "Deployment in Dev Environment"
+                      sh '''
+                        kubectl apply -f  Docker/deployment.yaml -n "$Env_Name"
+                        sleep 10
+		                kubectl apply -f Docker/service.yaml -n "$Env_Name"
+                      '''
+                   }
+                }
+             stage('Kubernetes SBOX'){
+               when {
+                 expression { "$Env_Name" == 'sbox-ns' }
+               }
+               steps {
+                   echo "Deployment in SBOX Environment"
+                      sh '''
+                        kubectl apply -f  Docker/deployment.yaml -n "$Env_Name"
+                        sleep 10
+		                kubectl apply -f Docker/service.yaml -n "$Env_Name"
+                    '''
+                  }
+                }
+             stage('Kubernetes Prod '){
+               when {
+                 expression { "$Env_Name" == 'prod-ns' }
+               }
+               steps {
+                   echo "Deployment in Prod Environment"
+                     sh '''
+                        kubectl apply -f  Docker/deployment.yaml -n "$Env_Name"
+                        sleep 10
+		                kubectl apply -f Docker/service.yaml -n "$Env_Name"
+                      '''
+                  }
+                }
+            }
+          }
+         stage (' Deployment Validation') {
+	        steps {
+                sh '''
+                  sleep 10
+                   kubectl get all -n "$Env_Name"
+                 '''
+             }
+         }
+     }
+}
