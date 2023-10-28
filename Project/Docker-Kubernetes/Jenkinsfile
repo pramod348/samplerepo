@@ -10,7 +10,7 @@ pipeline{
          jdk 'JAVA_HOME'
     }
 
-    stages{
+    stages {
        stage('Git Checkout'){
             steps{
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/GoudSagar/Hello-World-Code.git']]])
@@ -43,24 +43,22 @@ pipeline{
                  }
             }
         }
-        stage('Docker') {
-               stage('Docker Build') {
-                 steps{
+         stage ('Docker Build') {
+                 steps {
                     script {
                       sh "docker build -t goudsagar/webapp-app-tomcat:latest -f Project/Docker-Kubernetes/Dockerfile ."
                      }
                     } 
                 }
-                stage('Docker Push') {
+                stage ('Docker Push') {
                  steps{
                    script {
                         withDockerRegistry(credentialsId: 'docker-credentials') {
                             sh "docker push goudsagar/webapp-app-tomcat:latest"
-                             }
-                         }
                      }
-                } 
-          } 
+                  }
+               }
+           } 
           stage('Kubernetes Deployment') {
             parallel {
               stage('Kubernetes Dev') {
