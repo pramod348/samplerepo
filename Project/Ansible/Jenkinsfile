@@ -9,14 +9,13 @@ pipeline{
          maven 'MAVEN_HOME'
          jdk 'JAVA_HOME'
     }
-
-    stages{
-       stage('Git Checkout'){
+    stages {
+       stage('Git Checkout') {
             steps{
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/GoudSagar/Hello-World-Code.git']]])
             }
         }
-        stage('build'){
+        stage('build') {
             steps{
                sh '''
                 mvn package
@@ -42,6 +41,12 @@ pipeline{
                  }
             }
         }
-
+        stage('post-build step') {
+            steps {
+		sh '''
+                echo "Successfull Pipeline"
+		'''
+	    }
+	}
      }
 }
