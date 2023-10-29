@@ -10,6 +10,13 @@ pipeline{
          jdk 'JAVA_HOME'
     }
     stages {
+     stage('pre-build step') {
+            steps {
+		sh '''
+                echo "Pre Build Step"
+		'''
+	    }
+	}
        stage('Git Checkout') {
             steps{
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/GoudSagar/Hello-World-Code.git']]])
@@ -41,6 +48,13 @@ pipeline{
                  }
             }
         }
+        stage('Nexus Artifact Upload') {
+            steps {
+		sh '''
+                echo "Nexus Upload"
+		'''
+	    }
+	}
         stage('Ansible Deployment') {
          parallel {
             stage('Ansible Dev Deployment') {
