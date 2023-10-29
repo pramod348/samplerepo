@@ -50,6 +50,13 @@ pipeline{
                  }
             }
         }
+	stage('Nexus Artifact Upload') {
+            steps {
+		sh '''
+                echo "Nexus Artifact Upload"
+		'''
+	    }
+	}
         stage ('Tomcat Deployment') {
            steps {
              script {
