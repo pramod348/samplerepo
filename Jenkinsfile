@@ -52,11 +52,19 @@ pipeline{
         }
 	stage('Jfrog Artifact Upload') {
             steps {
-		sh '''
-                echo "Jfrog Artifact Upload"
-		'''
-	    }
-	}
+              rtUpload (
+                serverId: 'artifactory',
+                spec: '''{
+                      "files": [
+                        {
+                          "pattern": "*.war",
+                           "target": "local-snapshot-repo"
+                        }
+                    ]
+                }'''
+              )
+          }
+        }
         stage ('Tomcat Deployment') {
            steps {
              script {
