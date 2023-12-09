@@ -48,13 +48,21 @@ pipeline{
                  }
             }
         }
-        stage('Nexus Artifact Upload') {
+         stage('Jfrog Artifact Upload') {
             steps {
-		sh '''
-                echo "Nexus Upload"
-		'''
-	    }
-	}
+              rtUpload (
+                serverId: 'artifactory',
+                spec: '''{
+                      "files": [
+                        {
+                          "pattern": "*.war",
+                           "target": "local-snapshot-repo"
+                        }
+                    ]
+                }'''
+              )
+          }
+        }
         stage('Ansible Deployment') {
          parallel {
             stage('Ansible Dev Deployment') {
