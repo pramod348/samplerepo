@@ -1,28 +1,25 @@
 pipeline{
-    agent {
-      node {
-        label 'slave_1'
-      }
-    }
+    agent any
 
     tools {
          maven 'MAVEN_HOME'
          jdk 'JAVA_HOME'
     }
-    stages {
-     stage('pre-build step') {
+
+    stages{
+        stage('pre-build step') {
             steps {
 		sh '''
                 echo "Pre Build Step"
 		'''
 	    }
 	}
-       stage('Git Checkout') {
+        stage('Git Checkout'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/GoudSagar/Hello-World-Code.git']]])
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/pramod348/samplerepo.git']])
             }
         }
-        stage('build') {
+        stage('build'){
             steps{
                sh '''
                 mvn package
@@ -37,7 +34,8 @@ pipeline{
                 '''
              }
          }
-         stage ('Static Code Analysis') {
+  
+        stage ('Static Code Analysis') {
              environment {
              scannerHome = tool 'SONAR_SCANNER'
              }
@@ -48,10 +46,10 @@ pipeline{
                  }
             }
         }
-         stage('Jfrog Artifact Upload') {
+	stage('Jfrog Artifact Upload') {
             steps {
               rtUpload (
-                serverId: 'artifactory',
+                serverId: 'jfrog',
                 spec: '''{
                       "files": [
                         {
@@ -63,7 +61,14 @@ pipeline{
               )
           }
         }
-        stage('Ansible Deployment') {
+        stage ('Tomcat Deployment') {
+           steps {
+             script {
+                 deploy adapters: [tomcat7(credentialsId: 'credtomcat', path: '', url: 'http://13.235.77.181:8080')], contextPath: 'web-app', war: '**/*.war' onFailure: false, war: 'webapp/target/webapp.war' 
+                    }
+                  }
+           }
+	stage('Ansible Deployment') {
          parallel {
             stage('Ansible Dev Deployment') {
                 when {
@@ -87,13 +92,14 @@ pipeline{
                     } 
                   }
                 }
-            }
-        stage('post-build step') {
+            }  
+         stage('post-build step') {
             steps {
 		sh '''
                 echo "Successfull Pipeline"
 		'''
 	    }
 	}
+    
      }
 }
