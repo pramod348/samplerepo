@@ -1,6 +1,5 @@
 pipeline{
     agent any
-}
 
     tools {
          maven 'MAVEN_HOME'
@@ -17,7 +16,7 @@ pipeline{
 	}
         stage('Git Checkout'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'github access', url: 'https://github.com/GoudSagar/Hello-World-Code.git']]])
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/pramod348/samplerepo.git']])
             }
         }
         stage('build'){
@@ -65,7 +64,7 @@ pipeline{
         stage ('Tomcat Deployment') {
            steps {
              script {
-                 deploy adapters: [tomcat7(credentialsId: 'tomcat-credentials', path: '', url: 'http://3.19.79.30:8080')], contextPath: '/webapp-app', onFailure: false, war: 'webapp/target/webapp.war' 
+                 deploy adapters: [tomcat7(credentialsId: 'credtomcat', path: '', url: 'http://13.235.77.181:8080')], contextPath: 'web-app', war: '**/*.war', onFailure: false, war: 'web-app/target/webapp.war' 
                     }
                   }
            }
@@ -78,4 +77,5 @@ pipeline{
 	}
     
      }
+ }
 }
