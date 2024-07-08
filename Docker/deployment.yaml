@@ -1,20 +1,24 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: webapp-application-deployment
+  name: mc-app
+  labels:
+    app: mc-app
 spec:
- replicas: 1
- selector:
-  matchLabels:
-   app: my-app
- template:
-  metadata:
-   labels:
-    app: my-app
-  spec:
-   containers:
-   - name: my-app
-     image: docker.io/goudsagar/webapp-app-tomcat:latest
-     imagePullPolicy: IfNotPresent
-     ports:
-     - containerPort: 8080
+  replicas: 4
+  selector:
+    matchLabels:
+      app: mc-app
+  template:
+    metadata:
+      labels:
+        app: mc-app
+    spec:
+      containers:
+      - name: mc-app
+        image: pramod348/cicd:7
+        ports:
+        - containerPort: 8080
+
+  
