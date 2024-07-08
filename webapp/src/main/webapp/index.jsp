@@ -1,2 +1,2 @@
-<h1> Hello, Welcome to Techiescorner Simple DevOps Project !!   </h1>
+<h1> Hello, Hello Pramod CICD Pipeline is Successfull !!   </h1>
 <h1> Devops Project </h1>
