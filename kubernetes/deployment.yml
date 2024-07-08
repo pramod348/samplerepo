@@ -1,23 +1,24 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: my-deployment
- labels:
-  name: nginxpod
-  type: frontend
+  name: mc-app
+  labels:
+    app: mc-app
 spec:
- template:
-  metadata:
-   name: my-pod
-   labels:
-    name: nginxpod
-    type: frontend
-  spec:
-   containers:
-   - name: nginx-container
-     image: nginx:latest
- replicas: 5
- selector:
-  matchLabels:
-   name: nginxpod
-   type: frontend
+  replicas: 4
+  selector:
+    matchLabels:
+      app: mc-app
+  template:
+    metadata:
+      labels:
+        app: mc-app
+    spec:
+      containers:
+      - name: mc-app
+        image: pramod348/cicd:7
+        ports:
+        - containerPort: 8080
+
+  
